@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <math.h>
- 
+
 #include "defines.h"
 
 #include "render.cpp"
