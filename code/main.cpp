@@ -99,9 +99,21 @@ int main(int argc, char *argv[]) {
         VK_EXT_DEBUG_UTILS_EXTENSION_NAME
     };
     uint32 appExtensionCount = ARRAY_SIZE(appExtensions);
+    uint32 extensionCount = appExtensionCount + glfwExtensionCount;
+    char **extensions = (char**)malloc(extensionCount * sizeof(appExtensions[0]));
+    for(int i = 0; i < glfwExtensionCount; i++)
+    {
+        extensions[i] = (char*)malloc((strlen(glfwExtensions[i]) + 1) * sizeof(char));
+        strcpy(extensions[i], glfwExtensions[i]);
+    }
+    for(int i = 0; i < appExtensionCount; i ++)
+    {
+        extensions[i + glfwExtensionCount] = (char*)malloc((strlen(appExtensions[i]) + 1) * sizeof(char));
+        strcpy(extensions[i + glfwExtensionCount], appExtensions[i]);
+    }
     
-    createInfo.enabledExtensionCount = glfwExtensionCount;
-    createInfo.ppEnabledExtensionNames = glfwExtensions;
+    createInfo.enabledExtensionCount = extensionCount;
+    createInfo.ppEnabledExtensionNames = extensions;
     
     if(vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
     {
@@ -111,7 +123,7 @@ int main(int argc, char *argv[]) {
     PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
     VkDebugUtilsMessengerEXT debugMessenger;
     VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
-    debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CALLBACK_DATA_EXT;
+    debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
     debugCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT|VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT|
     VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT|VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
     debugCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT|VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT|
