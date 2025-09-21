@@ -125,7 +125,11 @@ int main(int argc, char *argv[]) {
         glfwPollEvents();
     }
     
-    
+    if(enableValidationLayers)
+    {
+        PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+        vkDestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+    }
     
     vkDestroyInstance(instance, nullptr);
     
