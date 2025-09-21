@@ -21,12 +21,6 @@ typedef int64_t int64;
 typedef float float32;
 typedef double float64;
 
-struct screen_buffer
-{
-    void *Memory;
-    int Width;
-    int Height;
-    int Pitch;
-};
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
 #endif
