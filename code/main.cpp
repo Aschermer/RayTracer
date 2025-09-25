@@ -19,6 +19,8 @@
 struct QueueFamilyIndicies {
     bool graphicsFamilyFound;
     uint32 graphicsFamily;
+    bool presentFamilyFound;
+    uint32 presentFamily;
 };
 
 
@@ -29,6 +31,10 @@ const char *validationLayers[]= {
 
 const char *appExtensions[] = {
     VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+};
+
+const char *deviceExtensions[] = {
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
 
@@ -211,7 +217,7 @@ int main(int argc, char *argv[]) {
     
     for(int i = 0; i < deviceCount; i++)
     {
-        QueueFamilyIndicies indicies;
+        QueueFamilyIndicies indicies{};
         
         uint32 queueFamilyCount = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(devices[i], &queueFamilyCount, nullptr);
@@ -226,10 +232,46 @@ int main(int argc, char *argv[]) {
                 indicies.graphicsFamilyFound = true;
                 indicies.graphicsFamily = j;
             }
+            VkBool32 presentSupport = false;
+            vkGetPhysicalDeviceSurfaceSupportKHR(devices[i], j, surface, &presentSupport);
+            if(presentSupport)
+            {
+                indicies.presentFamilyFound = true;
+                indicies.presentFamily = j;
+            }
+        }
+        
+        uint32 deviceExtensionCount;
+        vkEnumerateDeviceExtensionProperties(devices[i], nullptr, &deviceExtensionCount, nullptr);
+        
+        VkExtensionProperties *supportedDeviceExtensions = (VkExtensionProperties *)malloc(sizeof(VkExtensionProperties) * deviceExtensionCount);
+        vkEnumerateDeviceExtensionProperties(devices[i], nullptr, &deviceExtensionCount, supportedDeviceExtensions);
+        
+        bool supportsExtensions = true;
+        for(int j = 0; j < ARRAY_SIZE(deviceExtensions); j++)
+        {
+            bool extensionFound = false;
+            for(int k = 0; k < deviceExtensionCount; k++)
+            {
+                if(strcmp(supportedDeviceExtensions[k].extensionName, deviceExtensions[j]))
+                {
+                    extensionFound = true;
+                }
+            }
+            
+            if(!extensionFound)
+            {
+                supportsExtensions = false;
+                break;
+            }
         }
         
         
-        if(indicies.graphicsFamilyFound)
+        
+        
+        bool queueFamiliesFound = indicies.graphicsFamilyFound && indicies.presentFamilyFound;
+        
+        if(queueFamiliesFound && supportsExtensions)
         {
             physicalDevice = devices[i];
             physicalDeviceIndicies = indicies;
@@ -240,6 +282,10 @@ int main(int argc, char *argv[]) {
     {
         printf("No Suitable Devices");
     }
+    
+    
+    
+    
     
     
     VkDevice device;
