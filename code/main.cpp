@@ -305,7 +305,8 @@ int main(int argc, char *argv[]) {
     
     deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
     
-    deviceCreateInfo.enabledExtensionCount = 0;
+    deviceCreateInfo.enabledExtensionCount = ARRAY_SIZE(deviceExtensions);
+    deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions;
     deviceCreateInfo.enabledLayerCount = 0;
     
     if(vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device) != VK_SUCCESS)
